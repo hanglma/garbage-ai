@@ -3,11 +3,11 @@ from tensorflow.keras import Input, Model
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
 
 # Größe der Bilder (,3 für die 3 Farben)
-inputs = Input(shape=(32, 32, 3))
+inputs = Input(shape=(180, 180, 3))
 Klassen = 10
 
 # Unser Modell. Conv2D sind die Filter/Muster, welche automatisch gelernt werden
-x = Conv2D(32, (3, 3), activation='relu')(inputs)
+x = Conv2D(180, (3, 3), activation='relu')(inputs)
 # Pooling verringert die Größe der Filterergebnisse --> Damit fokussieren wir uns nur auf das wesentliche
 x = MaxPooling2D((2, 2))(x)
 # Wir geben immer die vorhergehenden Ergebnisse in die nächste Stufe, hier eine weitere Filter/Muster Ebene.
@@ -33,7 +33,7 @@ train_ds = tf.keras.utils.image_dataset_from_directory(
     subset="training",
     seed=123,
     image_size=(180, 180),
-    batch_size=32
+    batch_size=180
 )
 
 val_ds = tf.keras.utils.image_dataset_from_directory(
@@ -42,7 +42,7 @@ val_ds = tf.keras.utils.image_dataset_from_directory(
     subset="validation",
     seed=123,
     image_size=(180, 180),
-    batch_size=32
+    batch_size=180
 )
 
 
