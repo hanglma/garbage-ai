@@ -48,7 +48,6 @@ val_ds = tf.keras.utils.image_dataset_from_directory(
     batch_size=32
 )
 
-
 normalization = tf.keras.layers.Rescaling(1./255)
 
 train_ds = train_ds.map(lambda x, y: (normalization(x), y))
@@ -60,3 +59,9 @@ val_ds = val_ds.cache().prefetch(buffer_size=tf.data.AUTOTUNE)
 
 model.compile(optimizer='adam', loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True), metrics=['accuracy'])
 history = model.fit(train_ds, epochs=10, validation_data=val_ds)
+
+converter = tf.lite.TFLiteConverter.from_keras_model(model)
+tflite_model = converter.convert()
+
+with open("model.tflite") as f:
+    f.write(tflite_model)
