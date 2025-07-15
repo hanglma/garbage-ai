@@ -11,7 +11,7 @@ import sys
 IMG_SIZE = 180
 BATCH_SIZE = 32
 
-DATA_DIR = "archive/garbage_classification/"
+DATA_DIR = "garbage_classification/"
 
 VALIDATION_SPLIT = 0.2
 EPOCHS = 10
