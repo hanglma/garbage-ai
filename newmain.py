@@ -1,8 +1,9 @@
 import tensorflow as tf
-from tensorflow.keras import models
-from tensorflow.keras.layers import *
-from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.losses import SparseCategoricalCrossentropy
+from keras import models
+from keras.layers import *
+from keras.optimizers import Adam
+from keras.losses import SparseCategoricalCrossentropy
+from keras import regularizers
 from typing import Tuple
 import matplotlib.pyplot as plt
 import os
@@ -11,15 +12,17 @@ import sys
 IMG_SIZE = 180
 BATCH_SIZE = 32
 
-DATA_DIR = "archive/garbage_classification/"
+DATA_DIR = "medium_archive/garbage_classification/"
 
 VALIDATION_SPLIT = 0.2
 EPOCHS = 10
 LEARNING_RATE = 0.001
 
-CLASSES = 12
+CLASSES = 8
 
 AUTOTUNE = tf.data.AUTOTUNE
+
+L2_REGULATION = 0.001
 
 def load_data_sets() -> Tuple[tf.data.Dataset, tf.data.Dataset]:
     if not os.path.exists(DATA_DIR):
@@ -50,23 +53,24 @@ def plot_accuracy(history):
     plt.ylabel('Accuracy')
     plt.ylim([0.5, 1])
     plt.legend(loc='lower right')
-
-    # test_loss, test_acc = model.evaluate(test_images,  test_labels, verbose=2)
+    plt.show()
 
 def main():
     (train_ds, val_ds) = load_data_sets()
 
     model = models.Sequential([
-        Rescaling(1./255, input_shape=(IMG_SIZE, IMG_SIZE, 3)),
-        Conv2D(16, 3, activation="relu"),
+        Input(shape=(IMG_SIZE, IMG_SIZE, 3)),
+        Rescaling(1./255),
+        Conv2D(16, 3, activation="relu", kernel_regularizer=regularizers.l2(L2_REGULATION)),
         MaxPooling2D(),
-        Conv2D(32, 3, activation="relu"),
+        Conv2D(32, 3, activation="relu", kernel_regularizer=regularizers.l2(L2_REGULATION)),
         MaxPooling2D(),
-        Conv2D(64, 3, activation="relu"),
+        Conv2D(64, 3, activation="relu", kernel_regularizer=regularizers.l2(L2_REGULATION)),
         MaxPooling2D(),
         Flatten(),
-        Dense(64, activation="relu"),
-        Dense(CLASSES, activation="softmax")
+        Dropout(0.5),
+        Dense(64, activation="relu", kernel_regularizer=regularizers.l2(L2_REGULATION)),
+        Dense(CLASSES, activation="softmax", kernel_regularizer=regularizers.l2(L2_REGULATION))
     ])
 
     model.compile(
@@ -83,7 +87,7 @@ def main():
 
     plot_accuracy(history)
 
-    model.save("garbage-slayer-v1")
+    model.save("garbage_slayer_v1.keras")
 
 if __name__ == "__main__":
     main()
