@@ -3,6 +3,7 @@ from keras import models
 from keras.layers import *
 from keras.optimizers import Adam
 from keras.losses import SparseCategoricalCrossentropy
+from keras.applications import MobileNetV2
 from keras import regularizers
 from typing import Tuple
 import matplotlib.pyplot as plt
@@ -58,19 +59,16 @@ def plot_accuracy(history):
 def main():
     (train_ds, val_ds) = load_data_sets()
 
+    base_model = MobileNetV2(weights="imagenet", include_top=False,input_shape=(IMG_SIZE, IMG_SIZE, 3))
+    base_model.trainable = False
+
     model = models.Sequential([
         Input(shape=(IMG_SIZE, IMG_SIZE, 3)),
         Rescaling(1./255),
-        Conv2D(16, 3, activation="relu", kernel_regularizer=regularizers.l2(L2_REGULATION)),
-        MaxPooling2D(),
-        Conv2D(32, 3, activation="relu", kernel_regularizer=regularizers.l2(L2_REGULATION)),
-        MaxPooling2D(),
-        Conv2D(64, 3, activation="relu", kernel_regularizer=regularizers.l2(L2_REGULATION)),
-        MaxPooling2D(),
+        base_model,
         Flatten(),
-        Dropout(0.5),
-        Dense(64, activation="relu", kernel_regularizer=regularizers.l2(L2_REGULATION)),
-        Dense(CLASSES, activation="softmax", kernel_regularizer=regularizers.l2(L2_REGULATION))
+        Dense(64, activation="relu"),
+        Dense(CLASSES, activation="softmax")
     ])
 
     model.compile(
