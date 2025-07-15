@@ -4,7 +4,7 @@ from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
 
 # Größe der Bilder (,3 für die 3 Farben)
 inputs = Input(shape=(180, 180, 3))
-Klassen = 10
+Klassen = 12
 
 # Unser Modell. Conv2D sind die Filter/Muster, welche automatisch gelernt werden
 x = Conv2D(180, (3, 3), activation='relu')(inputs)
@@ -24,7 +24,7 @@ outputs = Dense(Klassen, activation='softmax')(x)
 model = Model(inputs=inputs, outputs=outputs)
 model.summary()
 
-path = "archive/"
+path = "archive/garbage_classification/"
 
 val_split = 0.2
 train_ds = tf.keras.utils.image_dataset_from_directory(
@@ -33,8 +33,11 @@ train_ds = tf.keras.utils.image_dataset_from_directory(
     subset="training",
     seed=123,
     image_size=(180, 180),
-    batch_size=180
+    batch_size=32
 )
+
+for images, labels in train_ds.take(1):
+    print(labels.numpy())
 
 val_ds = tf.keras.utils.image_dataset_from_directory(
     path,
@@ -42,7 +45,7 @@ val_ds = tf.keras.utils.image_dataset_from_directory(
     subset="validation",
     seed=123,
     image_size=(180, 180),
-    batch_size=180
+    batch_size=32
 )
 
 
