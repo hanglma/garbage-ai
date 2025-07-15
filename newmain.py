@@ -4,6 +4,7 @@ from tensorflow.keras.layers import *
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.losses import SparseCategoricalCrossentropy
 from typing import Tuple
+import matplotlib.pyplot as plt
 import os
 import sys
 
@@ -42,6 +43,16 @@ def load_data_sets() -> Tuple[tf.data.Dataset, tf.data.Dataset]:
     ).cache().prefetch(buffer_size=AUTOTUNE)
     return (train_ds, val_ds)
 
+def plot_accuracy(history):
+    plt.plot(history.history['accuracy'], label='accuracy')
+    plt.plot(history.history['val_accuracy'], label = 'val_accuracy')
+    plt.xlabel('Epoch')
+    plt.ylabel('Accuracy')
+    plt.ylim([0.5, 1])
+    plt.legend(loc='lower right')
+
+    # test_loss, test_acc = model.evaluate(test_images,  test_labels, verbose=2)
+
 def main():
     (train_ds, val_ds) = load_data_sets()
 
@@ -64,11 +75,13 @@ def main():
         metrics=["accuracy"]
     )
 
-    model.fit(
+    history = model.fit(
         train_ds,
         validation_data=val_ds,
         epochs=EPOCHS
     )
+
+    plot_accuracy(history)
 
     model.save("garbage-slayer-v1")
 
