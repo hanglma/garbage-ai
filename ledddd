@@ -1,0 +1,47 @@
+import RPi.GPIO as GPIO
+import time
+
+# GPIO pin setup
+RED_PIN = 17
+GREEN_PIN = 27
+BLUE_PIN = 22
+
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(RED_PIN, GPIO.OUT)
+GPIO.setup(GREEN_PIN, GPIO.OUT)
+GPIO.setup(BLUE_PIN, GPIO.OUT)
+
+# Set up PWM on the pins at 100Hz
+red = GPIO.PWM(RED_PIN, 100)
+green = GPIO.PWM(GREEN_PIN, 100)
+blue = GPIO.PWM(BLUE_PIN, 100)
+
+# Start PWM with 0% duty cycle (off)
+red.start(0)
+green.start(0)
+blue.start(0)
+
+def set_color(r, g, b):
+    red.ChangeDutyCycle(r)    # Values from 0 to 100
+    green.ChangeDutyCycle(g)
+    blue.ChangeDutyCycle(b)
+
+try:
+    while True:
+        set_color(100, 0, 0)   # Red
+        time.sleep(1)
+        set_color(0, 100, 0)   # Green
+        time.sleep(1)
+        set_color(0, 0, 100)   # Blue
+        time.sleep(1)
+        set_color(100, 100, 100) # White
+        time.sleep(1)
+        set_color(0, 0, 0)     # Off
+        time.sleep(1)
+except KeyboardInterrupt:
+    pass
+
+red.stop()
+green.stop()
+blue.stop()
+GPIO.cleanup()
